@@ -1,4 +1,4 @@
-package com.example.wewatch.model
+package com.example.wewatchmvc.model
 
 import androidx.room.Dao
 import androidx.room.Insert

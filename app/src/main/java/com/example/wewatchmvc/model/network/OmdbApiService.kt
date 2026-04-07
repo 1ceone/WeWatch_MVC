@@ -1,6 +1,6 @@
-package com.example.wewatch.model.network
+package com.example.wewatchmvc.model.network
 
-import com.example.wewatch.model.OmdbSearchResponse
+import com.example.wewatchmvc.model.OmdbSearchResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

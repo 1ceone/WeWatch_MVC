@@ -1,12 +1,12 @@
-package com.example.wewatch.controller
+package com.example.wewatchmvc.controller
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import com.example.wewatch.model.Movie
-import com.example.wewatch.model.MovieDatabase
+import com.example.wewatchmvc.model.Movie
+import com.example.wewatchmvc.model.MovieDatabase
 
 class AddController(private val context: Context) {
 

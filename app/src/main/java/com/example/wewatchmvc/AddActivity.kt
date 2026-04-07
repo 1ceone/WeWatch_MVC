@@ -1,13 +1,13 @@
-package com.example.wewatch
+package com.example.wewatchmvc
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.wewatch.controller.AddController
-import com.example.wewatch.databinding.ActivityAddBinding
-import com.example.wewatch.model.Movie
+import com.example.wewatchmvc.controller.AddController
+import com.example.wewatchmvc.databinding.ActivityAddBinding
+import com.example.wewatchmvc.model.Movie
 import com.bumptech.glide.Glide
 
 class AddActivity : AppCompatActivity(), AddController.AddCallback {

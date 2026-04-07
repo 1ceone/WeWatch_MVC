@@ -1,4 +1,4 @@
-package com.example.wewatch.model
+package com.example.wewatchmvc.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

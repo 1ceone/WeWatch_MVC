@@ -1,11 +1,11 @@
-package com.example.wewatch.controller
+package com.example.wewatchmvc.controller
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import com.example.wewatch.model.SearchResult
-import com.example.wewatch.model.network.RetrofitInstance
+import com.example.wewatchmvc.model.SearchResult
+import com.example.wewatchmvc.model.network.RetrofitInstance
 
 class SearchController {
 

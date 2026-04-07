@@ -1,4 +1,4 @@
-package com.example.wewatch.view.adapter
+package com.example.wewatchmvc.view.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.wewatch.model.SearchResult
+import com.example.wewatchmvc.model.SearchResult
 import com.example.wewatchmvc.R
 
 class SearchResultAdapter(

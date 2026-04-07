@@ -1,14 +1,14 @@
-package com.example.wewatch
+package com.example.wewatchmvc
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.wewatch.controller.MainController
-import com.example.wewatch.databinding.ActivityMainBinding
-import com.example.wewatch.model.Movie
-import com.example.wewatch.view.adapter.MovieAdapter
+import com.example.wewatchmvc.controller.MainController
+import com.example.wewatchmvc.databinding.ActivityMainBinding
+import com.example.wewatchmvc.model.Movie
+import com.example.wewatchmvc.view.adapter.MovieAdapter
 
 class MainActivity : AppCompatActivity(), MainController.MainCallback {
 

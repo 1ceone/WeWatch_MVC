@@ -6,10 +6,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.wewatch.controller.SearchController
-import com.example.wewatch.model.Movie
-import com.example.wewatch.model.SearchResult
-import com.example.wewatch.view.adapter.SearchResultAdapter
+import com.example.wewatchmvc.controller.SearchController
+import com.example.wewatchmvc.databinding.ActivitySearchBinding
+import com.example.wewatchmvc.model.Movie
+import com.example.wewatchmvc.model.SearchResult
+import com.example.wewatchmvc.view.adapter.SearchResultAdapter
 import java.io.Serializable
 
 class SearchActivity : AppCompatActivity(), SearchController.SearchCallback {
