@@ -1,47 +1,103 @@
-package com.example.wewatchmvc
+package com.example.wewatch
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.wewatchmvc.ui.theme.WeWatchMVCTheme
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.wewatch.controller.MainController
+import com.example.wewatch.databinding.ActivityMainBinding
+import com.example.wewatch.model.Movie
+import com.example.wewatch.view.adapter.MovieAdapter
+import com.example.wewatchmvc.AddActivity
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity(), MainController.MainCallback {
+
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var controller: MainController
+    private lateinit var movieAdapter: MovieAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            WeWatchMVCTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Создаем контроллер
+        controller = MainController(this)
+        controller.setCallback(this)
+
+        setupRecyclerView()
+        setupFab()
+        setupDeleteButton()
+
+        // Загружаем фильмы
+        controller.loadMovies()
+    }
+
+    private fun setupRecyclerView() {
+        movieAdapter = MovieAdapter(emptyList()) { _, _ -> }
+        binding.rvMovies.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = movieAdapter
+        }
+    }
+
+    private fun setupFab() {
+        binding.fabAdd.setOnClickListener {
+            startActivity(Intent(this, AddActivity::class.java))
+        }
+    }
+
+    private fun setupDeleteButton() {
+        binding.toolbar.inflateMenu(R.menu.menu_main)
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_delete -> {
+                    val selectedMovies = movieAdapter.getSelectedMovies()
+                    if (selectedMovies.isNotEmpty()) {
+                        controller.deleteMovies(selectedMovies)
+                        movieAdapter.clearSelection()
+                    } else {
+                        Toast.makeText(this, "Выберите фильмы для удаления", Toast.LENGTH_SHORT).show()
+                    }
+                    true
                 }
+                else -> false
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun showEmptyState(isEmpty: Boolean) {
+        if (isEmpty) {
+            binding.ivEmpty.visibility = android.view.View.VISIBLE
+            binding.tvEmpty.visibility = android.view.View.VISIBLE
+            binding.rvMovies.visibility = android.view.View.GONE
+        } else {
+            binding.ivEmpty.visibility = android.view.View.GONE
+            binding.tvEmpty.visibility = android.view.View.GONE
+            binding.rvMovies.visibility = android.view.View.VISIBLE
+        }
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WeWatchMVCTheme {
-        Greeting("Android")
+    // Callback методы
+    override fun onMoviesLoaded(movies: List<Movie>) {
+        if (movies.isEmpty()) {
+            showEmptyState(true)
+        } else {
+            showEmptyState(false)
+            movieAdapter.updateMovies(movies)
+        }
+    }
+
+    override fun onMovieAdded() {
+        Toast.makeText(this, "Фильм добавлен", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onMoviesDeleted() {
+        Toast.makeText(this, "Фильмы удалены", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onError(error: String) {
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show()
     }
 }
