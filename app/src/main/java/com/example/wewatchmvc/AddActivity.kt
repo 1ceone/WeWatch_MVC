@@ -16,6 +16,7 @@ class AddActivity : AppCompatActivity(), AddController.AddCallback {
     private lateinit var controller: AddController
     private var selectedMovie: Movie? = null
 
+    // Запуск SearchActivity для поиска фильма
     private val searchLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -23,7 +24,7 @@ class AddActivity : AppCompatActivity(), AddController.AddCallback {
             val movie = result.data?.getSerializableExtra("selected_movie") as? Movie
             movie?.let {
                 selectedMovie = it
-                updateUIWithMovie(it)
+                displayMovieInfo(it)
             }
         }
     }
@@ -33,29 +34,26 @@ class AddActivity : AppCompatActivity(), AddController.AddCallback {
         binding = ActivityAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Создаем контроллер
         controller = AddController(this)
         controller.setCallback(this)
 
         setupClickListeners()
+
+        // Если передан фильм из другого места, отображаем его
+        (intent.getSerializableExtra("movie") as? Movie)?.let {
+            selectedMovie = it
+            displayMovieInfo(it)
+        }
     }
 
     private fun setupClickListeners() {
-        binding.btnSearch.setOnClickListener {
-            val searchQuery = binding.etSearchQuery.text.toString().trim()
-            if (searchQuery.isNotEmpty()) {
-                val intent = Intent(this, SearchActivity::class.java)
-                intent.putExtra("search_query", searchQuery)
-                val year = binding.etYear.text.toString().trim()
-                if (year.isNotEmpty()) {
-                    intent.putExtra("search_year", year)
-                }
-                searchLauncher.launch(intent)
-            } else {
-                Toast.makeText(this, "Введите название фильма", Toast.LENGTH_SHORT).show()
-            }
+        // Кнопка для открытия экрана поиска
+        binding.btnSearchMovie.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
+            searchLauncher.launch(intent)
         }
 
+        // Кнопка добавления фильма в БД
         binding.btnAddMovie.setOnClickListener {
             selectedMovie?.let { movie ->
                 controller.addMovie(movie)
@@ -63,9 +61,9 @@ class AddActivity : AppCompatActivity(), AddController.AddCallback {
         }
     }
 
-    private fun updateUIWithMovie(movie: Movie) {
-        binding.etTitle.setText(movie.title)
-        binding.etYearResult.setText(movie.year)
+    private fun displayMovieInfo(movie: Movie) {
+        binding.tvMovieTitle.text = movie.title
+        binding.tvMovieYear.text = movie.year
 
         val posterUrl = movie.posterUrl
         if (posterUrl.isNotEmpty() && posterUrl != "N/A") {
@@ -78,12 +76,12 @@ class AddActivity : AppCompatActivity(), AddController.AddCallback {
             binding.ivPoster.setImageResource(R.drawable.ic_placeholder)
         }
 
-        binding.ivPoster.visibility = android.view.View.VISIBLE
+        binding.movieInfoContainer.visibility = android.view.View.VISIBLE
     }
 
-    // Callback методы от AddController
+    // Callback методы
     override fun onMovieAdded() {
-        Toast.makeText(this, "Фильм добавлен", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Фильм добавлен в список", Toast.LENGTH_SHORT).show()
         finish()
     }
 

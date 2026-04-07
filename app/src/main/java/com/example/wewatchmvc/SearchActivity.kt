@@ -2,7 +2,6 @@ package com.example.wewatchmvc
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,7 +10,6 @@ import com.example.wewatchmvc.databinding.ActivitySearchBinding
 import com.example.wewatchmvc.model.Movie
 import com.example.wewatchmvc.model.SearchResult
 import com.example.wewatchmvc.view.adapter.SearchResultAdapter
-import java.io.Serializable
 
 class SearchActivity : AppCompatActivity(), SearchController.SearchCallback {
 
@@ -28,23 +26,41 @@ class SearchActivity : AppCompatActivity(), SearchController.SearchCallback {
         controller.setCallback(this)
 
         setupRecyclerView()
+        setupSearchButton()
 
+        // Автоматический поиск если есть запрос
         val searchQuery = intent.getStringExtra("search_query") ?: ""
         val searchYear = intent.getStringExtra("search_year")
 
         if (searchQuery.isNotEmpty()) {
+            binding.etSearchQuery.setText(searchQuery)
+            searchYear?.let { binding.etYear.setText(it) }
             controller.searchMovies(searchQuery, searchYear)
         }
     }
 
     private fun setupRecyclerView() {
         adapter = SearchResultAdapter(emptyList()) { result: SearchResult ->
+            // При клике на результат передаем фильм обратно
             onMovieSelected(result)
         }
 
         binding.rvResults.apply {
             layoutManager = LinearLayoutManager(this@SearchActivity)
             adapter = this@SearchActivity.adapter
+        }
+    }
+
+    private fun setupSearchButton() {
+        binding.btnSearch.setOnClickListener {
+            val query = binding.etSearchQuery.text.toString().trim()
+            val year = binding.etYear.text.toString().trim()
+
+            if (query.isNotEmpty()) {
+                controller.searchMovies(query, year.takeIf { it.isNotEmpty() })
+            } else {
+                Toast.makeText(this, "Введите название фильма", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -56,8 +72,9 @@ class SearchActivity : AppCompatActivity(), SearchController.SearchCallback {
             imdbId = result.imdbId ?: ""
         )
 
+        // Возвращаем выбранный фильм в AddActivity
         val intent = Intent().apply {
-            putExtra("selected_movie", movie as Serializable)
+            putExtra("selected_movie", movie as java.io.Serializable)
         }
         setResult(RESULT_OK, intent)
         finish()
@@ -68,16 +85,16 @@ class SearchActivity : AppCompatActivity(), SearchController.SearchCallback {
         adapter.updateResults(results)
 
         if (results.isEmpty()) {
-            binding.tvEmpty.visibility = View.VISIBLE
-            binding.rvResults.visibility = View.GONE
+            binding.tvEmpty.visibility = android.view.View.VISIBLE
+            binding.rvResults.visibility = android.view.View.GONE
         } else {
-            binding.tvEmpty.visibility = View.GONE
-            binding.rvResults.visibility = View.VISIBLE
+            binding.tvEmpty.visibility = android.view.View.GONE
+            binding.rvResults.visibility = android.view.View.VISIBLE
         }
     }
 
     override fun onLoading(isLoading: Boolean) {
-        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        binding.progressBar.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
     }
 
     override fun onError(error: String) {
