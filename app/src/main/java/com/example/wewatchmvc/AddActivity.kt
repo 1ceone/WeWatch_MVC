@@ -1,20 +1,19 @@
-package com.example.wewatchmvc
+package com.example.wewatch
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
-import com.example.wewatchmvc.SearchActivity
-import com.example.wewatch.controller.MainController
+import com.example.wewatch.controller.AddController
+import com.example.wewatch.databinding.ActivityAddBinding
 import com.example.wewatch.model.Movie
+import com.bumptech.glide.Glide
 
-class AddActivity : AppCompatActivity() {
+class AddActivity : AppCompatActivity(), AddController.AddCallback {
 
     private lateinit var binding: ActivityAddBinding
-    private lateinit var controller: MainController
+    private lateinit var controller: AddController
     private var selectedMovie: Movie? = null
 
     private val searchLauncher = registerForActivityResult(
@@ -34,7 +33,9 @@ class AddActivity : AppCompatActivity() {
         binding = ActivityAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        controller = MainController(this)
+        // Создаем контроллер
+        controller = AddController(this)
+        controller.setCallback(this)
 
         setupClickListeners()
     }
@@ -58,7 +59,6 @@ class AddActivity : AppCompatActivity() {
         binding.btnAddMovie.setOnClickListener {
             selectedMovie?.let { movie ->
                 controller.addMovie(movie)
-                finish()
             } ?: Toast.makeText(this, "Сначала найдите фильм", Toast.LENGTH_SHORT).show()
         }
     }
@@ -78,6 +78,16 @@ class AddActivity : AppCompatActivity() {
             binding.ivPoster.setImageResource(R.drawable.ic_placeholder)
         }
 
-        binding.ivPoster.visibility = View.VISIBLE
+        binding.ivPoster.visibility = android.view.View.VISIBLE
+    }
+
+    // Callback методы от AddController
+    override fun onMovieAdded() {
+        Toast.makeText(this, "Фильм добавлен", Toast.LENGTH_SHORT).show()
+        finish()
+    }
+
+    override fun onError(error: String) {
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show()
     }
 }

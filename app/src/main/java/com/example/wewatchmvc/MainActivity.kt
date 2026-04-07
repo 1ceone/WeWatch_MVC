@@ -9,7 +9,6 @@ import com.example.wewatch.controller.MainController
 import com.example.wewatch.databinding.ActivityMainBinding
 import com.example.wewatch.model.Movie
 import com.example.wewatch.view.adapter.MovieAdapter
-import com.example.wewatchmvc.AddActivity
 
 class MainActivity : AppCompatActivity(), MainController.MainCallback {
 
@@ -87,10 +86,6 @@ class MainActivity : AppCompatActivity(), MainController.MainCallback {
             showEmptyState(false)
             movieAdapter.updateMovies(movies)
         }
-    }
-
-    override fun onMovieAdded() {
-        Toast.makeText(this, "Фильм добавлен", Toast.LENGTH_SHORT).show()
     }
 
     override fun onMoviesDeleted() {

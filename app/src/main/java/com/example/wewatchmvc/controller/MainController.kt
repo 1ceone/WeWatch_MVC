@@ -15,7 +15,6 @@ class MainController(private val context: Context) {
 
     interface MainCallback {
         fun onMoviesLoaded(movies: List<Movie>)
-        fun onMovieAdded()
         fun onMoviesDeleted()
         fun onError(error: String)
     }
@@ -42,22 +41,6 @@ class MainController(private val context: Context) {
         }
     }
 
-    fun addMovie(movie: Movie) {
-        scope.launch(Dispatchers.IO) {
-            try {
-                database.movieDao().insert(movie)
-                scope.launch(Dispatchers.Main) {
-                    callback?.onMovieAdded()
-                    loadMovies()
-                }
-            } catch (e: Exception) {
-                scope.launch(Dispatchers.Main) {
-                    callback?.onError("Ошибка добавления: ${e.message}")
-                }
-            }
-        }
-    }
-
     fun deleteMovies(selectedMovies: List<Movie>) {
         scope.launch(Dispatchers.IO) {
             try {
@@ -65,7 +48,7 @@ class MainController(private val context: Context) {
                 database.movieDao().deleteMoviesByImdbIds(imdbIds)
                 scope.launch(Dispatchers.Main) {
                     callback?.onMoviesDeleted()
-                    loadMovies()
+                    loadMovies() // Перезагружаем список
                 }
             } catch (e: Exception) {
                 scope.launch(Dispatchers.Main) {
