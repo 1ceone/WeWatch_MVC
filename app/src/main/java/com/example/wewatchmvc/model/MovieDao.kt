@@ -12,11 +12,11 @@ interface MovieDao {
     fun getAllMovies(): Flow<List<Movie>>
 
     @Insert
-    suspend fun insert(movie: Movie)
+    fun insert(movie: Movie)
 
     @Delete
-    suspend fun delete(movie: Movie)
+    fun delete(movie: Movie)
 
     @Query("DELETE FROM movies WHERE imdbId IN (:imdbIds)")
-    suspend fun deleteMoviesByImdbIds(imdbIds: List<String>)
+    fun deleteMoviesByImdbIds(imdbIds: List<String>)
 }

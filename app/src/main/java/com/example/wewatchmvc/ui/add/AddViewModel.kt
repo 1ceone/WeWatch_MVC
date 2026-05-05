@@ -1,20 +1,31 @@
 package com.example.wewatchmvc.ui.add
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wewatchmvc.core.BaseViewModel
 import com.example.wewatchmvc.model.Movie
 import com.example.wewatchmvc.model.MovieDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
-class AddViewModel(private val context: Context) : BaseViewModel<AddState, AddIntent, AddEffect>() {
+class AddViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val database = MovieDatabase.getDatabase(context)
+    private val database = MovieDatabase.getDatabase(application.applicationContext)
     private var currentMovie: Movie? = null
 
-    override val initialState: AddState = AddState.Idle
+    private val _state = MutableStateFlow<AddState>(AddState.Idle)
+    val state: StateFlow<AddState> = _state.asStateFlow()
 
-    override fun handleIntent(intent: AddIntent) {
+    private val _effect = MutableSharedFlow<AddEffect>()
+    val effect: SharedFlow<AddEffect> = _effect.asSharedFlow()
+
+    fun handleIntent(intent: AddIntent) {
         when (intent) {
             is AddIntent.SelectMovie -> selectMovie(intent.movie)
             is AddIntent.AddMovie -> addMovie()
@@ -25,33 +36,39 @@ class AddViewModel(private val context: Context) : BaseViewModel<AddState, AddIn
 
     private fun selectMovie(movie: Movie) {
         currentMovie = movie
-        setState { AddState.MovieSelected(movie) }
+        _state.value = AddState.MovieSelected(movie)
     }
 
     private fun addMovie() {
         currentMovie?.let { movie ->
-            viewModelScope.launch {
-                setState { AddState.Adding }
+            viewModelScope.launch(Dispatchers.IO) {
+                _state.value = AddState.Adding
 
                 try {
                     database.movieDao().insert(movie)
-                    setState { AddState.Success("Фильм добавлен") }
-                    emitEffect(AddEffect.ShowToast("Фильм добавлен в список"))
-                    emitEffect(AddEffect.NavigateBack)
+                    _state.value = AddState.Success("Фильм добавлен")
+                    _effect.emit(AddEffect.ShowToast("Фильм добавлен в список"))
+                    _effect.emit(AddEffect.NavigateBack)
                 } catch (e: Exception) {
-                    setState { AddState.Error("Ошибка добавления: ${e.message}") }
-                    emitEffect(AddEffect.ShowToast("Ошибка добавления: ${e.message}"))
+                    _state.value = AddState.Error("Ошибка добавления: ${e.message}")
+                    _effect.emit(AddEffect.ShowToast("Ошибка добавления: ${e.message}"))
                 }
             }
-        } ?: emitEffect(AddEffect.ShowToast("Сначала выберите фильм"))
+        } ?: run {
+            viewModelScope.launch {
+                _effect.emit(AddEffect.ShowToast("Сначала выберите фильм"))
+            }
+        }
     }
 
     private fun navigateToSearch() {
-        emitEffect(AddEffect.NavigateToSearch)
+        viewModelScope.launch {
+            _effect.emit(AddEffect.NavigateToSearch)
+        }
     }
 
     private fun reset() {
         currentMovie = null
-        setState { AddState.Idle }
+        _state.value = AddState.Idle
     }
 }

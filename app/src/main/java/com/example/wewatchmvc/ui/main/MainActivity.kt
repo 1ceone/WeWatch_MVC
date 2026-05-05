@@ -6,12 +6,15 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wewatchmvc.R
 import com.example.wewatchmvc.databinding.ActivityMainBinding
 import com.example.wewatchmvc.model.Movie
-import com.example.wewatchmvc.ui.add.AddActivity  // ← ВАЖНО: правильный импорт
+import com.example.wewatchmvc.ui.add.AddActivity
 import com.example.wewatchmvc.view.adapter.MovieAdapter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +22,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var movieAdapter: MovieAdapter
 
-    private val viewModel: MainViewModel by viewModels()
+    // Исправленный способ создания ViewModel
+    private val viewModel: MainViewModel by viewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return MainViewModel(application) as T
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
