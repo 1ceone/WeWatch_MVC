@@ -18,7 +18,7 @@ class SearchController {
     }
 
     private var callback: SearchCallback? = null
-    private val apiKey = "484c9232" // ЗАМЕНИТЕ НА ВАШ КЛЮЧ
+    private val apiKey = "484c9232"
 
     fun setCallback(callback: SearchCallback) {
         this.callback = callback
