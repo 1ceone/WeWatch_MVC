@@ -8,23 +8,27 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.wewatchmvc.model.Movie
 import com.example.wewatchmvc.R
+import com.example.wewatchmvc.model.Movie
 
 class MovieAdapter(
     private var movies: List<Movie>,
     private val onItemCheckChanged: (Movie, Boolean) -> Unit
 ) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
-    private val selectedMovies = mutableSetOf<Movie>()
+    private var selectedMovies = mutableSetOf<String>()
 
     fun updateMovies(newMovies: List<Movie>) {
         movies = newMovies
-        clearSelection()
         notifyDataSetChanged()
     }
 
-    fun getSelectedMovies(): List<Movie> = selectedMovies.toList()
+    fun setSelectedMovies(selectedIds: Set<String>) {
+        selectedMovies = selectedIds.toMutableSet()
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedMovies(): List<Movie> = movies.filter { selectedMovies.contains(it.imdbId) }
 
     fun clearSelection() {
         selectedMovies.clear()
@@ -64,13 +68,8 @@ class MovieAdapter(
                 posterImageView.setImageResource(R.drawable.ic_placeholder)
             }
 
-            checkBox.isChecked = selectedMovies.contains(movie)
+            checkBox.isChecked = selectedMovies.contains(movie.imdbId)
             checkBox.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    selectedMovies.add(movie)
-                } else {
-                    selectedMovies.remove(movie)
-                }
                 onItemCheckChanged(movie, isChecked)
             }
         }
