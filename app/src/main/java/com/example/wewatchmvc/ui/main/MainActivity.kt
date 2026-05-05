@@ -7,12 +7,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.wewatchmvc.AddActivity
+import com.example.wewatchmvc.R
 import com.example.wewatchmvc.databinding.ActivityMainBinding
 import com.example.wewatchmvc.model.Movie
+import com.example.wewatchmvc.ui.add.AddActivity  // ← ВАЖНО: правильный импорт
 import com.example.wewatchmvc.view.adapter.MovieAdapter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        movieAdapter = MovieAdapter(emptyList()) { movie, isChecked ->
+        movieAdapter = MovieAdapter(emptyList()) { movie: Movie, isChecked: Boolean ->
             viewModel.handleIntent(MainIntent.SelectMovie(movie.imdbId, isChecked))
         }
         binding.rvMovies.apply {
@@ -45,13 +45,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.state.onEach { state ->
-            renderState(state)
-        }.launchIn(lifecycleScope)
+        lifecycleScope.launch {
+            viewModel.state.collect { state ->
+                renderState(state)
+            }
+        }
 
-        viewModel.effect.onEach { effect ->
-            renderEffect(effect)
-        }.launchIn(lifecycleScope)
+        lifecycleScope.launch {
+            viewModel.effect.collect { effect ->
+                renderEffect(effect)
+            }
+        }
     }
 
     private fun renderState(state: MainState) {
@@ -71,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLoading() {
-        // Показать прогресс (опционально)
+        // Показать прогресс
     }
 
     private fun showMovies(movies: List<Movie>, selectedIds: Set<String>) {

@@ -3,16 +3,15 @@ package com.example.wewatchmvc.ui.add
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.wewatchmvc.R
 import com.example.wewatchmvc.databinding.ActivityAddBinding
 import com.example.wewatchmvc.model.Movie
 import com.example.wewatchmvc.ui.search.SearchActivity
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class AddActivity : AppCompatActivity() {
 
@@ -21,7 +20,7 @@ class AddActivity : AppCompatActivity() {
     private val viewModel: AddViewModel by viewModels()
 
     private val searchLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val movie = result.data?.getSerializableExtra("selected_movie") as? Movie
@@ -39,7 +38,6 @@ class AddActivity : AppCompatActivity() {
         setupObservers()
         setupClickListeners()
 
-        // Если передан фильм из другого места
         (intent.getSerializableExtra("movie") as? Movie)?.let {
             viewModel.handleIntent(AddIntent.SelectMovie(it))
         }
@@ -56,13 +54,17 @@ class AddActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.state.onEach { state ->
-            renderState(state)
-        }.launchIn(lifecycleScope)
+        lifecycleScope.launch {
+            viewModel.state.collect { state ->
+                renderState(state)
+            }
+        }
 
-        viewModel.effect.onEach { effect ->
-            renderEffect(effect)
-        }.launchIn(lifecycleScope)
+        lifecycleScope.launch {
+            viewModel.effect.collect { effect ->
+                renderEffect(effect)
+            }
+        }
     }
 
     private fun renderState(state: AddState) {
@@ -122,5 +124,6 @@ class AddActivity : AppCompatActivity() {
     private fun showError(message: String) {
         binding.btnAddMovie.isEnabled = true
         binding.btnAddMovie.text = "Добавить в список"
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 }

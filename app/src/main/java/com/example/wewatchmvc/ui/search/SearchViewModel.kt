@@ -11,7 +11,7 @@ class SearchViewModel : BaseViewModel<SearchState, SearchIntent, SearchEffect>()
 
     private val apiKey = "484c9232" // Замените на ваш ключ
 
-    override fun createInitialState(): SearchState = SearchState.Idle
+    override val initialState: SearchState = SearchState.Idle
 
     override fun handleIntent(intent: SearchIntent) {
         when (intent) {

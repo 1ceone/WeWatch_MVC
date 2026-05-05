@@ -12,7 +12,7 @@ class AddViewModel(private val context: Context) : BaseViewModel<AddState, AddIn
     private val database = MovieDatabase.getDatabase(context)
     private var currentMovie: Movie? = null
 
-    override fun createInitialState(): AddState = AddState.Idle
+    override val initialState: AddState = AddState.Idle
 
     override fun handleIntent(intent: AddIntent) {
         when (intent) {

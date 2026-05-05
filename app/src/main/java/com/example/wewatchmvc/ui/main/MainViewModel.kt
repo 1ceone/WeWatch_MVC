@@ -13,7 +13,7 @@ class MainViewModel(private val context: Context) : BaseViewModel<MainState, Mai
     private val database = MovieDatabase.getDatabase(context)
     private var allMovies: List<Movie> = emptyList()
 
-    override fun createInitialState(): MainState = MainState.Loading
+    override val initialState: MainState = MainState.Loading
 
     override fun handleIntent(intent: MainIntent) {
         when (intent) {
